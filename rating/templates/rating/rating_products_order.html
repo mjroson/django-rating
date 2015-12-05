@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load staticfiles %}
+{% block title %}{% trans "Rating" %}{% endblock %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'bower_components/star-rating/jquery.rating.css' %} ">
+{% endblock %}
+{% block breadcrumb %}
+    {{ block.super }}
+    <li><span class="active">{% trans "Rating your products' order" %}</span></li>
+{% endblock breadcrumb %}
+
+{% block content %}
+
+    <header class="content-title">
+        <h1 class="title">{% trans 'Rating' %}</h1>
+        <div class="md-margin"></div><!-- space -->
+    </header>
+
+    <div class="row">
+        <div class="xs-margin"></div>
+        {% bootstrap_messages %}
+        <form method="post" action="" role="form">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            {% for form in formset %}
+
+                <div class="col-md-3 col-sm-6 col-xs-12 panel panel-default" style="padding: 5px;">
+                    <div class="panel-body">
+                        <div class="col-md-12 item-image-containe" style="min-width: 150px; min-height: 150px; position: relative;">
+                            <i class="fa fa-spinner fa-spin fa-2x img-loading"></i>
+                            <img style="margin-left: auto; margin-right: auto; position: relative; z-index: 2;" src="{{ form.instance.voted.images.first.image.crop.150x150 }}" alt=""/>
+                        </div>
+                        <div class="col-md-12" style="margin-top: 10px;">
+                            <h4 class="text-center">{{ form.instance.voted.name }}</h4>
+                            {{ form.id }}
+                            <div class="rating-{{ forloop.counter }}">
+                                {% for radio in form.rate %}
+                                    {{ radio.tag }}
+                                    {#                            {{ radio.choice_label }}#}
+                                    <script>
+                                        $(document).ready(function() {
+                                            $('.rating-{{ forloop.counter }}').find('input:radio').rating();
+                                        });
+                                    </script>
+                                {% endfor %}
+                            </div>
+                            {% if form.rate.errors %}
+                                <span class="help-block">{{ form.rate.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+
+            {% endfor %}
+            <div class="col-md-12">
+                {% buttons %}
+                    <button class="btn btn-lg btn-primary pull-right" type="submit">{% trans 'Voter' %}</button>
+                {% endbuttons %}
+            </div>
+        </form>
+    </div>
+{% endblock %}
+{% block footer_scripts %}
+    <script type="text/javascript" src="{% static 'bower_components/star-rating/jquery.rating.js' %}"></script>
+{% endblock %}
+
